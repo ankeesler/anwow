@@ -30,22 +30,39 @@ func wow(s string) string {
 }
 
 func handle(w http.ResponseWriter, r *http.Request) {
-	bodyBytes, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(fmt.Sprintf("\"%s\"\n", err.Error())))
-		return
-	}
 	defer r.Body.Close()
+	defer ioutil.ReadAll(r.Body)
 
 	path := r.URL.Path
-	bodyString := string(bodyBytes)
-	log.Printf("%s %s '%s'", r.Method, path, bodyString)
+	contentType := r.Header.Get("Accept")
+	log.Printf("%s %s Content-Type: %s", r.Method, path, contentType)
 
-	if path == "/" {
-		w.Write([]byte(fmt.Sprintf("\"%s\"\n", wow(bodyString))))
+	text := wow(
+		strings.TrimSpace(
+			strings.ReplaceAll(path, "/", " "),
+		),
+	)
+
+	if strings.Contains(contentType, "text/html") {
+		w.Header().Set("Content-Type", "text/html")
+		w.Write(
+			[]byte(
+				fmt.Sprintf(
+					`<div align="center">%s</div>`,
+					text,
+				),
+			),
+		)
 	} else {
-		w.Write([]byte(fmt.Sprintf("\"%s\"\n", wow(strings.TrimSpace(strings.ReplaceAll(path, "/", " "))))))
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(
+			[]byte(
+				fmt.Sprintf(
+					"\"%s\"\n",
+					text,
+				),
+			),
+		)
 	}
 }
 
