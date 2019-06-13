@@ -48,7 +48,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		w.Write(
 			[]byte(
 				fmt.Sprintf(
-					`<div align="center">%s</div>`,
+					`<div style="font-size:50px;margin:30px" align="center">%s</div>`,
 					text,
 				),
 			),
