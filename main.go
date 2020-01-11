@@ -43,6 +43,10 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		),
 	)
 
+	if r.URL.Query().Get("clap") == "1" {
+		text = strings.ReplaceAll(text, " ", " &#x1f44f ")
+	}
+
 	if strings.Contains(contentType, "text/html") {
 		w.Header().Set("Content-Type", "text/html")
 		w.Write(
